@@ -3,12 +3,12 @@
 #include "utils.H"
 #include "assert.H"
 
-SimpleFramePool::SimpleFramePool(unsigned long _base_frame_no,
+SimpleFramePool::SimpleFramePool(unsigned long _base_frame_no,//this is the constructor
                                  unsigned long _nframes,
                                  unsigned long _info_frame_no)
 {
     // Bitmap must fit in a single frame!
-    assert(_nframes <= FRAME_SIZE * 8);
+    assert(_nframes <= FRAME_SIZE * 8);// use to check whether the condition is true or not. It does so by calling assert macro from the assert.H directory and then that macro calls the _assert function. 
     
     base_frame_no = _base_frame_no;
     nframes = _nframes;
@@ -24,12 +24,12 @@ SimpleFramePool::SimpleFramePool(unsigned long _base_frame_no,
     }
     
     // Number of frames must be "fill" the bitmap!
-    assert ((nframes % 8 ) == 0);
+    assert ((nframes % 8 ) == 0);// checking if the number of maps are less than 8 or not 
     
     
     // Everything ok. Proceed to mark all bits in the bitmap
     for(int i=0; i*8 < _nframes; i++) {
-        bitmap[i] = 0xFF;
+        bitmap[i] = 0xFF;// marking all frames as free 
     }
     
     // Mark the first frame as being used if it is being used
@@ -56,7 +56,7 @@ unsigned long SimpleFramePool::get_frame()
         i++;
     }
     
-    frame_no += i * 8;
+    frame_no += i * 8;// to mark the bit number of that particular frame go to that frame map
     
     unsigned char mask = 0x80;
     while ((mask & bitmap[i]) == 0) {
