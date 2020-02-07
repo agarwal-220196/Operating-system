@@ -93,7 +93,7 @@ void SimpleFramePool::mark_inaccessible(unsigned long _frame_no)
     assert((bitmap[bitmap_index] & mask) != 0);// make sure it is not being used to mark it inacessible
     
     // Update bitmap
-    bitmap[bitmap_index] ^= mask; //update the position with 0
+    bitmap[bitmap_index] ^= mask;
     nFreeFrames--;
 }
 
