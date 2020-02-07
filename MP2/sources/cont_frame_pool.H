@@ -41,7 +41,21 @@
 class ContFramePool {
     
 private:
-    /* -- DEFINE YOUR CONT FRAME POOL DATA STRUCTURE(s) HERE. */
+    /* Using variable names similar as defined in the simple frame */
+
+unsigned char * bitmap; //bitmap char pointer 
+unsigned int 	nFreeFrames;//indicates the number of free frames
+unsigned long 	base_frame_no; //indicates the start of base frame 
+unsigned long 	nframes;	//indicates the sizeof frame pool. i.e. number of frames contained in this frame pool
+unsigned long 	info_frame_no;//indicates the frame management location 
+
+unsigned long	n_info_frames; //taking variable name as mentioned in  ContFramePool class. This will be used to for number of frames required to store management info. If not 0 then it is stored externally. 
+
+static ContFramePool* head_of_fame_pool;
+static ContFramePool* list_of_pool_fames;
+
+ContFramePool* next_fame_pool;
+
     
 public:
 
