@@ -28,7 +28,7 @@
 
 #define MEM_HOLE_START_FRAME ((15 MB) / (4 KB))
 #define MEM_HOLE_SIZE ((1 MB) / (4 KB))
-#define TEST_FRAME_SIZE ((20 MB)/(4 KB))
+#define TEST_FRAME_SIZE ((25 MB)/(4 KB))
 /* We have a 1 MB hole in physical memory starting at address 15 MB */
 
 #define TEST_START_ADDR_PROC (4 MB)
@@ -116,7 +116,7 @@ int main() {
 }
 
 void test_memory(ContFramePool * _pool, unsigned int _allocs_to_go) {
-    Console::puts("alloc_to_go = "); Console::puti(_allocs_to_go); Console::puts("\n");
+    //Console::puts("alloc_to_go = "); Console::puti(_allocs_to_go); Console::puts("\n");
     if (_allocs_to_go > 0) {
         int n_frames = _allocs_to_go % 4 + 1;
         unsigned long frame = _pool->get_frames(n_frames);

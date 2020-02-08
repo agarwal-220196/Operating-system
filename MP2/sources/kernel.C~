@@ -28,7 +28,7 @@
 
 #define MEM_HOLE_START_FRAME ((15 MB) / (4 KB))
 #define MEM_HOLE_SIZE ((1 MB) / (4 KB))
-#define TEST_FRAME_SIZE ((20 MB)/(4 KB))
+#define TEST_FRAME_SIZE ((25 MB)/(4 KB))
 /* We have a 1 MB hole in physical memory starting at address 15 MB */
 
 #define TEST_START_ADDR_PROC (4 MB)
@@ -97,6 +97,13 @@ int main() {
     test_memory(&kernel_mem_pool, 32);
 
     /* ---- Add code here to test the frame pool implementation. */
+	
+    test_memory(&process_mem_pool, 32);
+    Console::puts("Number of frames being requested: "); Console::puti(TEST_FRAME_SIZE);Console::puts("\n");
+
+    unsigned long hole_pool_info_frame = process_mem_pool.get_frames(TEST_FRAME_SIZE);
+
+
     
     /* -- NOW LOOP FOREVER */
     Console::puts("Testing is DONE. We will do nothing forever\n");
