@@ -383,10 +383,90 @@ void ContFramePool::release_frames(unsigned long _first_frame_no)
 {
     // TODO: IMPLEMENTATION NEEEDED!
     //assert(false);
-}
+
+	//finding the pool for this.frame
+
+	ContFramePool* pool_current = ControlFramePool::head_of_frame_pool;
+
+	while ((pool_current->base_frame_no > _first_frame_no || (pool_current->base_frame_no) + (pool_current->nframes) <= _first_frame_no )){
+
+	
+		if(pool_current->next_frame_pool==NULL){
+			Console::puts("No frame found to be released \n");
+			return;
+}//if 
+		else{
+
+			pool_current = pool_current->next_frame_pool;
+}//else
+	
+}//while loop
+
+
+	unsigned char* pointer_bitmap = pool_current->bitmap;
+
+	int difference_bit = ( _first_frame_no - pool_current->base_frame_no)*2;
+	int index_i = difference_bit /8;
+	int index_j = (difference_bit % 8)/2;
+
+
+	unsigned char mask_head = 0x80;
+	unsigned char mask_inacc = 0xC0;
+
+
+	mask_head = mask_head>>index_j*2;
+	mask_inacc = mask_inacc>>index_j*2;
+
+
+	if (((pointer_bitmap[index_i]^mask_head)&mask_inacc)==mask_inacc){
+
+		pointer_bitmap[index_i] =pointer_bitmap[index_i] & (~mask_inacc);
+		index_j++;
+		mask_inacc = mask_inacc>>2;
+		pool_current->nFreeFrames++;
+
+		while (index_j<4){
+			if ((pointer_bitmap[index_i]&mask_inacc)==mask_inacc){
+
+				pointer_bitmap[index_i] = pointer_bitmap[index_i] & (~mask_inacc);
+				index_j++;
+				mask_inacc = mask_inacc>>2;
+				pool_current->nFreeFrames++;
+}//if
+
+			else{
+				return;
+
+}//else
+}//while 
+
+		for (int i =index_i+1;i<(pool_current->base_frame_no + pool_current->nframes)/4;i++){
+			mask_inacc = 0xC0;
+			for(int j = 0; j<4; j++){
+
+				if ((pointer_bitmap[i] & mask_inacc)==mask_inacc{
+
+					pointer_bitmap[i] = pointer_bitmap[i] & (~mask_inacc);
+					mask_inacc = mask_inacc >>2;
+					pool_current->nFreeFrames++;
+}//if for loop J
+				else {
+					return;
+
+}//else
+}//for loop J
+}//for loop I		
+}//if 
+	else{
+		Console::puts("It is not head of sequence, cannot release this frame \n");
+}//else
+
+}//release frames
 
 unsigned long ContFramePool::needed_info_frames(unsigned long _n_frames)
 {
     // TODO: IMPLEMENTATION NEEEDED!
-    assert(false);
+ //   assert(false);
+	return (_n_frames*2)/(8*4 KB) + ((_n_frames*2)%(8*4 KB) >0?1:0);
+
 }
