@@ -216,13 +216,13 @@ unsigned long ContFramePool::get_frames(unsigned int _n_frames)
 		for (int j=0;j<4;j++){//this for loop will be used for accessin two bits 
 			if((bitmap[i] &	mask)==0){
 				if (frame_search==1){	
-					frames_needed--;
+					frames_needed--;//incase if it is the second search then we need to skip the increment of bit_1_of_bitmap_i, thus this loop is required. 
 
 }//if frame_search statement
 
 				else{
-					frame_search=1;
-					frame_no +=i*4 +j;
+					frame_search=1; // for the first frame that is being used, increment the bit_1_bitmap_i to the actual row number. 
+					frame_no +=i*4 +j;// same for the column number of bitmap
 					bit_1_of_bitmap_i = i;
 					bit_2_of_bitmap_j = j;		
 					frames_needed--;
@@ -232,8 +232,8 @@ unsigned long ContFramePool::get_frames(unsigned int _n_frames)
 	
 			else{
 				if (frame_search==1){
-					frame_no=base_frame_no;
-					frames_needed = _n_frames;
+					frame_no=base_frame_no;//reset frame info since new bit_1 is used by some other frames
+					frames_needed = _n_frames;// i.e. continuous memory is not available that is being requested. 
 					bit_1_of_bitmap_i = 0;
 					bit_2_of_bitmap_j = 0;
 					frame_search=0;
@@ -287,9 +287,9 @@ unsigned long ContFramePool::get_frames(unsigned int _n_frames)
 
 	for (int i=bit_1_of_bitmap_i+1;i<nframes/4;i++){
 		mask_2 = 0xC0;
-		for (int j=0;j<4;j++){
+		for (int j=0;j<4;j++){//once all entries in a single row are marked, then mark all the next continous entries
 			if (frame_set==0){
-				break;
+				break;//this is required to ensure that if requested number of frames don't go above a single row then we do not need any kind of modification
 }//if 
 			bitmap[i] = bitmap[i] | mask_2;
 			mask_2 = mask_2>>2;
@@ -306,7 +306,7 @@ unsigned long ContFramePool::get_frames(unsigned int _n_frames)
 
 	if(frame_search==1){
 
-		nFreeFrames -= _n_frames;
+		nFreeFrames -= _n_frames;// if frame search is successful then reduce the total number of frames from the pool
 		return frame_no;
 
 }//if-> frame_search=1 
@@ -367,7 +367,7 @@ void ContFramePool::mark_inaccessible(unsigned long _base_frame_no,
 					break;
 }//if
 				bitmap[i] = (bitmap[i] & ~mask_inverte)|mask_inacces;
-				mask_inacces = mask_inacces>>2;
+				mask_inacces = mask_inacces>>2;// same as previous loop
 				mask_inverte = mask_inverte>>2;
 				frame_set--;
 }//for J
