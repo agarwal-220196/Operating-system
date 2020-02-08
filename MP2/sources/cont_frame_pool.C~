@@ -193,8 +193,131 @@ Console::puts("Frame continuous pool initialized\n");
 unsigned long ContFramePool::get_frames(unsigned int _n_frames)
 {
     // TODO: IMPLEMENTATION NEEEDED!
-    assert(false);
+    //assert(false);
+
+	unsigned int frames_needed = _n_frames;
+	unsigned int frame_no = base_frame_no;
+	int frame_search =0;//this variable will be used to increment the counter to search for availble frame from bitmap. 
+	int frame_available_found=0; //this variable will indicate whether the frame has been found from the bit map or not 
+	int bit_1_of_bitmap_i=0;//used to index the array of bitmap
+	int bit_2_of_bitmap_j=0;//used to access indivial element of bitmap
+	
+	if (_n_frames > nFreeFrames){
+	
+	Console::puts("THESE FRAMES ARE NOT AVAILABLE\n");
+	Console::puts("Available free frames =");Console::puti(nFreeFrames);Console::puts("\n");	
+
 }
+	
+	for (unsigned int i=0;i<(nframes/4);i++){
+	unsigned char value_bit_map = bitmap[i];
+	unsigned char mask =0xC0; // C0 is 1100 we need two bits as we are using two bits
+					
+		for (int j=0;j<4;j++){//this for loop will be used for accessin two bits 
+			if((bitmap[i] &	mask)==0){
+				if (frame_search==1){	
+					frames_needed--;
+
+}//if frame_search statement
+
+				else{
+					frame_search=1;
+					frame_no +=i*4 +j;
+					bit_1_of_bitmap_i = i;
+					bit_2_of_bitmap_j = j;		
+					frames_needed--
+}//else of previous if
+
+}//if ->bitmap[i] & mask
+	
+			else{
+				if (frame_search==1){
+					frame_no=base_frame_no;
+					frames_needed = _n_frames;
+					bit_1_of_bitmap_i = 0;
+					bit_2_of_bitmap_j = 0;
+					frame_search=0;
+}//if frame_search==1			
+}//else of previous if->bitmap[i]
+
+			mask = mask>>2; // shift the mask to right by 2 always. 
+			if(frames_needed==0){//if all the available frames found as a continuous location
+				frame_available_found=1;
+				break;
+}//if-> frames_needed 0 	
+
+}//for loop with J 
+		if(frames_needed==0){
+			frame_available_found=1;
+			break;
+}//frames needed 0
+		
+}//for loop with I
+
+	
+	if (frame_available_found=0){
+		Console::puts("THESE FRAMES ARE NOT AVAILABLE for length");Console::puti(_n_frames);Console::puts("\n");	
+}//frame_available=0
+
+//setting the sequence 	
+	int frame_set = _n_frames;
+	unsigned char mask_head=0x40;
+	unsigned char mask_invert=0xC0;
+
+	mask_head = mask_head>>(bit_2_of_bitmap_j*2);
+	mask_invert = mask_invert>>(bit_2_of_bitmap_j*2);
+
+	bitmap[bit_1_of_bitmap_i] = (bitmap[bit_1_of_bitmap_i] & ~maskinvert) | mask_head;//first clear it and then assign the head
+
+	bit_2_of_bitmap_j++;
+	frame_set--;//head frame set thus decrement by 1 
+	
+	unsigned char mask_2 = 0xC0;
+	mask_2 = mask_2>>(bit_2_of_bitmap_j*2);
+
+	while (frame_set>0 && bit_2_of_bitmap_j<4){
+	
+		bitmap[bit_1_of_bitmap_i] = bitmap[bit_1_of_bitmap_i] | mask_2;
+
+		mask_2 = mask_2>>2;//setting all continuous frames in bitmaps
+		frame_set--;
+		bit_2_of_bitmap_j++;
+}//while loop
+
+
+	for (int i=bit_1_of_bitmap_i+1;i<nframes/4;i++){
+		mask_2 = 0xC0;
+		for (int j=0;j<4;j++){
+			if (frame_set==0){
+				break;
+}//if 
+			bitmap[i] = bitmap[i] | mask_2;
+			mask_2 = mask_2>>2;
+			frame_set--;
+}// for J
+
+		if (frame_set==0){
+			break;
+
+}//if ->frameset
+
+}//for I
+
+
+	if(frame_search==1){
+
+		nFreeFrames -= _n_frames;
+		return frame_no;
+
+}//if-> frame_search=1 
+
+	else{
+		Console::puts("THESE FRAMES ARE NOT AVAILABLE for length");Console::puti(_n_frames);Console::puts("\n");
+		return 0;		
+
+}//else
+
+}//class of get_frames
 
 void ContFramePool::mark_inaccessible(unsigned long _base_frame_no,
                                       unsigned long _n_frames)
