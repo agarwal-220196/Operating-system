@@ -225,7 +225,7 @@ unsigned long ContFramePool::get_frames(unsigned int _n_frames)
 					frame_no +=i*4 +j;
 					bit_1_of_bitmap_i = i;
 					bit_2_of_bitmap_j = j;		
-					frames_needed--
+					frames_needed--;
 }//else of previous if
 
 }//if ->bitmap[i] & mask
@@ -267,7 +267,7 @@ unsigned long ContFramePool::get_frames(unsigned int _n_frames)
 	mask_head = mask_head>>(bit_2_of_bitmap_j*2);
 	mask_invert = mask_invert>>(bit_2_of_bitmap_j*2);
 
-	bitmap[bit_1_of_bitmap_i] = (bitmap[bit_1_of_bitmap_i] & ~maskinvert) | mask_head;//first clear it and then assign the head
+	bitmap[bit_1_of_bitmap_i] = (bitmap[bit_1_of_bitmap_i] & ~mask_invert) | mask_head;//first clear it and then assign the head
 
 	bit_2_of_bitmap_j++;
 	frame_set--;//head frame set thus decrement by 1 
@@ -343,16 +343,16 @@ void ContFramePool::mark_inaccessible(unsigned long _base_frame_no,
 		unsigned char mask_inacces = 0x80;
 		unsigned char mask_inverte = 0xC0;
 
-		mask_inacess = mask_inacess>>(index_j*2);//getting to the actual frame.
+		mask_inacces = mask_inacces>>(index_j*2);//getting to the actual frame.
 
 		mask_inverte = mask_inverte>>(index_j*2);//getting to the actual frame.
 
 
 		while (frame_set > 0 && index_j < 4){
 
-			bitmap[index_i] =(bitmap[index_i] & (~mask_inverte)) | mask_inacess; //same as before
+			bitmap[index_i] =(bitmap[index_i] & (~mask_inverte)) | mask_inacces; //same as before
 
-			mask_inacess= mask_inacess>>2;
+			mask_inacces= mask_inacces>>2;
 			mask_inverte=mask_inverte>>2;
 			frame_set--;
 			index_j;		
@@ -360,14 +360,14 @@ void ContFramePool::mark_inaccessible(unsigned long _base_frame_no,
 }//while
 
 		for(int i = index_i+1; i<(index_i+_n_frames/4);i++){
-			mask_inacess = 0xC0;
+			mask_inacces = 0xC0;
 			mask_inverte = 0xC0;
 			for (int j=0; j<4;j++){
 				if (frame_set==0){
 					break;
 }//if
-				bitmap[i] = (bitmap[i] & ~mask_inverte)|mask_inacess;
-				mask_inacess = mask_inacess>>2;
+				bitmap[i] = (bitmap[i] & ~mask_inverte)|mask_inacces;
+				mask_inacces = mask_inacces>>2;
 				mask_inverte = mask_inverte>>2;
 				frame_set--;
 }//for J
@@ -386,18 +386,18 @@ void ContFramePool::release_frames(unsigned long _first_frame_no)
 
 	//finding the pool for this.frame
 
-	ContFramePool* pool_current = ControlFramePool::head_of_frame_pool;
+	ContFramePool* pool_current = ContFramePool::head_of_fame_pool;
 
 	while ((pool_current->base_frame_no > _first_frame_no || (pool_current->base_frame_no) + (pool_current->nframes) <= _first_frame_no )){
 
 	
-		if(pool_current->next_frame_pool==NULL){
+		if(pool_current->next_fame_pool==NULL){
 			Console::puts("No frame found to be released \n");
 			return;
 }//if 
 		else{
 
-			pool_current = pool_current->next_frame_pool;
+			pool_current = pool_current->next_fame_pool;
 }//else
 	
 }//while loop
@@ -444,7 +444,7 @@ void ContFramePool::release_frames(unsigned long _first_frame_no)
 			mask_inacc = 0xC0;
 			for(int j = 0; j<4; j++){
 
-				if ((pointer_bitmap[i] & mask_inacc)==mask_inacc{
+				if ((pointer_bitmap[i] & mask_inacc)==mask_inacc){
 
 					pointer_bitmap[i] = pointer_bitmap[i] & (~mask_inacc);
 					mask_inacc = mask_inacc >>2;
@@ -452,13 +452,12 @@ void ContFramePool::release_frames(unsigned long _first_frame_no)
 }//if for loop J
 				else {
 					return;
-
 }//else
 }//for loop J
 }//for loop I		
 }//if 
 	else{
-
+		Console::puts("It is not head of sequence, cannot release this frame \n");
 }//else
 
 }//release frames
@@ -466,5 +465,7 @@ void ContFramePool::release_frames(unsigned long _first_frame_no)
 unsigned long ContFramePool::needed_info_frames(unsigned long _n_frames)
 {
     // TODO: IMPLEMENTATION NEEEDED!
-    assert(false);
+ //   assert(false);
+	return (_n_frames*2)/(8*4 KB) + ((_n_frames*2)%(8*4 KB) >0?1:0);
+
 }
