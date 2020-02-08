@@ -317,19 +317,72 @@ unsigned long ContFramePool::get_frames(unsigned int _n_frames)
 
 }//else
 
-}//class of get_frames
+}//get_frames
 
 void ContFramePool::mark_inaccessible(unsigned long _base_frame_no,
                                       unsigned long _n_frames)
 {
     // TODO: IMPLEMENTATION NEEEDED!
     //assert(false);
-}
+
+	if ((_base_frame_no<base_frame_no) || ((base_frame_no + nframes) < (_base_frame_no + _n_frames))){
+
+		Console::puts("Index is out of range; unable to mark inaccessible \n ");
+
+}//if 
+
+	else{
+
+		nFreeFrames-=_n_frames;//removing from available free frames
+		int difference_bit = (_base_frame_no-base_frame_no)*2;
+		int index_i = difference_bit/8;//used to define the row number in the bit map
+		int index_j = (difference_bit % 8)/2;//used to define the index of the array.
+
+		int frame_set = _n_frames;
+
+		unsigned char mask_inacces = 0x80;
+		unsigned char mask_inverte = 0xC0;
+
+		mask_inacess = mask_inacess>>(index_j*2);//getting to the actual frame.
+
+		mask_inverte = mask_inverte>>(index_j*2);//getting to the actual frame.
+
+
+		while (frame_set > 0 && index_j < 4){
+
+			bitmap[index_i] =(bitmap[index_i] & (~mask_inverte)) | mask_inacess; //same as before
+
+			mask_inacess= mask_inacess>>2;
+			mask_inverte=mask_inverte>>2;
+			frame_set--;
+			index_j;		
+
+}//while
+
+		for(int i = index_i+1; i<(index_i+_n_frames/4);i++){
+			mask_inacess = 0xC0;
+			mask_inverte = 0xC0;
+			for (int j=0; j<4;j++){
+				if (frame_set==0){
+					break;
+}//if
+				bitmap[i] = (bitmap[i] & ~mask_inverte)|mask_inacess;
+				mask_inacess = mask_inacess>>2;
+				mask_inverte = mask_inverte>>2;
+				frame_set--;
+}//for J
+				
+			if (frame_set==0){
+				break;
+}//if 
+}//for I
+}//else 
+}// mark_inaccessible 
 
 void ContFramePool::release_frames(unsigned long _first_frame_no)
 {
     // TODO: IMPLEMENTATION NEEEDED!
-    assert(false);
+    //assert(false);
 }
 
 unsigned long ContFramePool::needed_info_frames(unsigned long _n_frames)
