@@ -123,11 +123,22 @@
 /* FORWARDS */
 /*--------------------------------------------------------------------------*/
 
-/* -- (none) -- */
+ContFramePool* ContFramePool::head_of_fame_pool; // this will be used here, since it was static in .H file, we need :: operator 
+ContFramePool* ContFramePool::list_of_pool_fames;// similar reason as above
+
 
 /*--------------------------------------------------------------------------*/
 /* METHODS FOR CLASS   C o n t F r a m e P o o l */
 /*--------------------------------------------------------------------------*/
+
+/*
+defining the meaning of two bits that will be used for bit mapping 
+
+01- frame head
+11- frame allocated
+00- frame free
+10- frame inaccessible 
+*/
 
 ContFramePool::ContFramePool(unsigned long _base_frame_no,
                              unsigned long _n_frames,
@@ -135,7 +146,48 @@ ContFramePool::ContFramePool(unsigned long _base_frame_no,
                              unsigned long _n_info_frames)
 {
     // TODO: IMPLEMENTATION NEEEDED!
-    assert(false);
+    //assert(false);
+
+// first check if the number of frames requested is less than the frame size.
+assert(_n_frames <= FRAME_SIZE*8);
+
+// assign the varibales passed on to the constructor to local variables. 
+base_frame_no = _base_frame_no;
+nframes	      = _n_frames;
+nFreeFrames   = _n_frames;
+info_frame_no =	_info_frame_no;
+n_info_frames = _n_info_frames;
+
+if(info_frame_no==0){//this implementation is same as simple frame
+	bitmap = (unsigned char *)(base_frame_no * FRAME_SIZE);
+}else {
+	bitmap = (unsigned char *)(info_frame_no * FRAME_SIZE);
+}
+
+assert((nframes % 8)==0);
+
+//initializing the frames as free frames. thus marking them with 0x00
+for (int i=0; (i*8)<(_n_frames*2);i++) {//since we are using 2 bits thus we need to check _n_frames*2;
+	bitmap[i]=0x0;// 0x00 defines free
+}
+
+if (_info_frame_no==0){
+	bitmap[0] = 0x40;//marking the first frame as head of frame
+	nFreeFrames--;
+}
+
+if (ContFramePool::head_of_fame_pool==NULL){
+	ContFramePool::head_of_fame_pool =this;//if no other frame of this pointer then assign the object starting address.
+	ContFramePool::list_of_pool_fames =this;
+}else{
+	ContFramePool::list_of_pool_fames->next_fame_pool = this;//if not then assign the next frame pool its address. 
+	ContFramePool::list_of_pool_fames=this;
+}
+
+next_fame_pool = NULL;
+
+Console::puts("Frame continuous pool initialized\n");
+
 }
 
 unsigned long ContFramePool::get_frames(unsigned int _n_frames)
