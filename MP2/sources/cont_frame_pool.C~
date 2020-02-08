@@ -388,30 +388,30 @@ void ContFramePool::release_frames(unsigned long _first_frame_no)
 
 	ContFramePool* pool_current = ContFramePool::head_of_fame_pool;
 
-	while ((pool_current->base_frame_no > _first_frame_no || (pool_current->base_frame_no) + (pool_current->nframes) <= _first_frame_no )){
+	while ((pool_current->base_frame_no > _first_frame_no || (pool_current->base_frame_no) + (pool_current->nframes) <= _first_frame_no )){// this loop is requried to go the desired object that is being requested to release the frame. 
 
 	
 		if(pool_current->next_fame_pool==NULL){
-			Console::puts("No frame found to be released \n");
+			Console::puts("No frame found to be released \n");//no frame found
 			return;
 }//if 
 		else{
 
-			pool_current = pool_current->next_fame_pool;
+			pool_current = pool_current->next_fame_pool; //pool frame found
 }//else
 	
 }//while loop
 
 
-	unsigned char* pointer_bitmap = pool_current->bitmap;
+	unsigned char* pointer_bitmap = pool_current->bitmap;// locating the bitmap of that frame
 
-	int difference_bit = ( _first_frame_no - pool_current->base_frame_no)*2;
-	int index_i = difference_bit /8;
-	int index_j = (difference_bit % 8)/2;
+	int difference_bit = ( _first_frame_no - pool_current->base_frame_no)*2;// then using the same logic as in get frames.
+	int index_i = difference_bit /8;// locating the row 
+	int index_j = (difference_bit % 8)/2;// locating the column number 
 
 
-	unsigned char mask_head = 0x80;
-	unsigned char mask_inacc = 0xC0;
+	unsigned char mask_head = 0x80;// using the mask index for head
+	unsigned char mask_inacc = 0xC0;// using the mask index for inacc
 
 
 	mask_head = mask_head>>index_j*2;
@@ -420,12 +420,12 @@ void ContFramePool::release_frames(unsigned long _first_frame_no)
 
 	if (((pointer_bitmap[index_i]^mask_head)&mask_inacc)==mask_inacc){
 
-		pointer_bitmap[index_i] =pointer_bitmap[index_i] & (~mask_inacc);
+		pointer_bitmap[index_i] =pointer_bitmap[index_i] & (~mask_inacc);// making the head frame free
 		index_j++;
 		mask_inacc = mask_inacc>>2;
 		pool_current->nFreeFrames++;
 
-		while (index_j<4){
+		while (index_j<4){// making the consecutive bits free
 			if ((pointer_bitmap[index_i]&mask_inacc)==mask_inacc){
 
 				pointer_bitmap[index_i] = pointer_bitmap[index_i] & (~mask_inacc);
@@ -442,7 +442,7 @@ void ContFramePool::release_frames(unsigned long _first_frame_no)
 
 		for (int i =index_i+1;i<(pool_current->base_frame_no + pool_current->nframes)/4;i++){
 			mask_inacc = 0xC0;
-			for(int j = 0; j<4; j++){
+			for(int j = 0; j<4; j++){// if frames are in next row this loop will make them free
 
 				if ((pointer_bitmap[i] & mask_inacc)==mask_inacc){
 
