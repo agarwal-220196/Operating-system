@@ -255,7 +255,7 @@ unsigned long ContFramePool::get_frames(unsigned int _n_frames)
 }//for loop with I
 
 	
-	if (frame_available_found=0){
+	if (frame_available_found==0){
 		Console::puts("THESE FRAMES ARE NOT AVAILABLE for length");Console::puti(_n_frames);Console::puts("\n");	
 }//frame_available=0
 
