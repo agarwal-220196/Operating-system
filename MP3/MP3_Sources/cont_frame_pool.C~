@@ -206,7 +206,7 @@ unsigned long ContFramePool::get_frames(unsigned int _n_frames)
 	
 	Console::puts("THESE FRAMES ARE NOT AVAILABLE\n");Console::puts("\n");
 	Console::puts("Available free frames =");Console::puti(nFreeFrames);Console::puts("\n");
-	assert(_n_frames < nFreeFrames); //to halt the implementation over there.
+	assert(_n_frames < nFreeFrames);
 
 }
 	
