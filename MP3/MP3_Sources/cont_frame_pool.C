@@ -2,7 +2,7 @@
  File: ContFramePool.C
  
  Author:Sanket Agarwal
- Date  : 02/07/2020
+ Date  : 02/20/2020
  
  */
 
@@ -206,6 +206,8 @@ unsigned long ContFramePool::get_frames(unsigned int _n_frames)
 	
 	Console::puts("THESE FRAMES ARE NOT AVAILABLE\n");Console::puts("\n");
 	Console::puts("Available free frames =");Console::puti(nFreeFrames);Console::puts("\n");
+	
+	//additional checker as compared to MP2	
 	assert(_n_frames < nFreeFrames); //to halt the implementation over there.
 
 }
