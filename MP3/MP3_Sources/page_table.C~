@@ -11,7 +11,7 @@
 #define PAGE_LEVEL_USER 4 // bit 2 defines the user level or the kernel level
 
 
-//initialization to null 
+
 PageTable * PageTable::current_page_table = NULL;
 unsigned int PageTable::paging_enabled = 0;
 ContFramePool * PageTable::kernel_mem_pool = NULL;
@@ -25,9 +25,9 @@ void PageTable::init_paging(ContFramePool * _kernel_mem_pool,
                             const unsigned long _shared_size)
 {
    //assert(false);
-   PageTable::kernel_mem_pool = _kernel_mem_pool;
-   PageTable::process_mem_pool = _process_mem_pool;
-   PageTable::shared_size = _shared_size;
+	
+
+
    Console::puts("Initialized Paging System\n");
 }
 
