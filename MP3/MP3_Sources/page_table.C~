@@ -16,6 +16,13 @@ bit 1 - high-->read and write; low-->read only
 bit 2 - high-->user mode; low--> kernel mode
 */
 
+/*
+
+the enabling of paging bit is referred from K.J.'s tutorial on 
+www.osdever.net/tutorials/view/implementing-basic-paging
+
+*/
+
 //initialization to null 
 PageTable * PageTable::current_page_table = NULL;
 unsigned int PageTable::paging_enabled = 0;
@@ -67,7 +74,7 @@ PageTable::PageTable()
 
 	address_value =0;
 	for (int i=1; i<number_of_shared_frames;i++){
-	page_directory[i]=address_value | PAGE_WRITE;// makrking it non present since it is not available yet 
+	page_directory[i]=address_value | PAGE_WRITE;// marking it non present since it is not available yet 
 	
 }//for i=1
 
@@ -77,14 +84,18 @@ PageTable::PageTable()
 
 void PageTable::load()
 {
-//assert(false);
-//Console::puts("Loaded page table\n");
+	//assert(false);
+	current_page_table = this;
+	write_cr3((unsigned long)page_directory);
+	Console::puts("Loaded page table\n");
 }
 
 void PageTable::enable_paging()
 {
-   assert(false);
-   Console::puts("Enabled paging\n");
+	//assert(false);
+	paging_enabled = 1;
+	write_cr0(read_cr0() | 0x80000000);//this is referred from K.J tutorial on implementing basic paging as mentioned in the handout. 
+	Console::puts("Enabled paging\n");
 }
 
 void PageTable::handle_fault(REGS * _r)
