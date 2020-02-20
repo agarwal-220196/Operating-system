@@ -10,6 +10,11 @@
 #define PAGE_WRITE   2 // because page write option is represented by the bit 1
 #define PAGE_LEVEL_USER 4 // bit 2 defines the user level or the kernel level
 
+/*
+bit 0 - high-->page present; low-->page not present 
+bit 1 - high-->read and write; low-->read only 
+bit 2 - high-->user mode; low--> kernel mode
+*/
 
 //initialization to null 
 PageTable * PageTable::current_page_table = NULL;
@@ -33,15 +38,47 @@ void PageTable::init_paging(ContFramePool * _kernel_mem_pool,
 
 PageTable::PageTable()
 {
-   assert(false);
-   Console::puts("Constructed Page Table object\n");
+	//assert(false);
+	
+
+	page_directory = (unsigned long*)(kernel_mem_pool->get_frames(PAGE_DIRECTORY_FRAME_SIZE)*PAGE_SIZE);//this will assign the page directory space. 
+
+	unsigned long address_value = 0;// it will be used to set reset the lower bits of entries
+
+	unsigned long * page_table_mapped_directly = (unsigned long *)(kernel_mem_pool->get_frames(PAGE_DIRECTORY_FRAME_SIZE)*PAGE_SIZE);
+
+	unsigned long number_of_shared_frames = (PageTable::shared_size/PAGE_SIZE);//indicates the number of frames for shared memory spaces.
+
+
+	/*
+	As mentioned in the handout, marking the shared memory with 
+	(USER LEVEL) kernel mode | read & write | present  
+	*/
+	//since the first 4mb is directly mapped, we can assign it directly
+	for (int i = 0; i<number_of_shared_frames; i++){//number of shared frames will be 1024 since we aare sharing only the first 4MB 
+		
+		page_table_mapped_directly[i] = address_value | PAGE_WRITE | PAGE_PRESENT;// since it is a shared memory, we will have a write access and the page is present since it is a directly mapped memory. 
+		address_value += PAGE_SIZE;
+	
+
+}//for i=0
+
+	page_directory[0] = (unsigned long) page_table_mapped_directly | PAGE_WRITE |PAGE_PRESENT;//doing the or operation with the first page table and storing it in the page directory 0. Since it is mapped directly, it is available and it can be written as well. 
+
+	address_value =0;
+	for (int i=1; i<number_of_shared_frames;i++){
+	page_directory[i]=address_value | PAGE_WRITE;// makrking it non present since it is not available yet 
+	
+}//for i=1
+
+	Console::puts("Constructed Page Table object\n");
 }
 
 
 void PageTable::load()
 {
-   assert(false);
-   Console::puts("Loaded page table\n");
+//assert(false);
+//Console::puts("Loaded page table\n");
 }
 
 void PageTable::enable_paging()
