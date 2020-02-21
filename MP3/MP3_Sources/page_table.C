@@ -44,7 +44,7 @@ void PageTable::init_paging(ContFramePool * _kernel_mem_pool,
                             const unsigned long _shared_size)
 {
    //assert(false);
-   PageTable::kernel_mem_pool = _kernel_mem_pool;
+   PageTable::kernel_mem_pool = _kernel_mem_pool;//assiging the passed variables to static variables. 
    PageTable::process_mem_pool = _process_mem_pool;
    PageTable::shared_size = _shared_size;
    Console::puts("Initialized Paging System\n");
@@ -127,26 +127,30 @@ i.e.	0000 0000 00		00 0000	0000		0000 0000 0000
  	unsigned long page_direct_addr = page_address >> PAGE_DIRECT_ADDR;
 	unsigned long page_table_addr  = page_address >> PAGE_TABLE_ADDR;
 		
-	unsigned long * page_table = NULL;
-	unsigned long error_code   = _r->err_code;
+	unsigned long * page_table = NULL;//will be used to store the page table entry 
+	unsigned long error_code   = _r->err_code;// read the error code 
 
 	unsigned long  user_level_mask = 0; //will be used to or the data with page_level
 
 
 	if ((error_code & PAGE_PRESENT)==0){
 
-		if ((current_page_directory[page_direct_addr] & PAGE_PRESENT)==1){
+		if ((current_page_directory[page_direct_addr] & PAGE_PRESENT)==1){//indicates a missing page table entry
 			
-			page_table = (unsigned long *)(current_page_directory[page_direct_addr]&EXCLUDE_LAST_12_BITS);
-	
-/*PAGE_PRESENT 1 // because this is represented by the bit 0
-#define PAGE_WRITE   2 // because page write option is represented by the bit 1
-#define PAGE_LEVEL_USER 4 // */	
-			page_table[page_table_addr & PAGE_TABLE_MASK] = (PageTable::process_mem_pool->get_frames(PAGE_DIRECTORY_FRAME_SIZE)*PAGE_SIZE) | PAGE_WRITE |PAGE_PRESENT;
+			page_table = (unsigned long *)(current_page_directory[page_direct_addr]&EXCLUDE_LAST_12_BITS);//exlude the offset 12 bits 
+		
+			page_table[page_table_addr & PAGE_TABLE_MASK] = (PageTable::process_mem_pool->get_frames(PAGE_DIRECTORY_FRAME_SIZE)*PAGE_SIZE) | PAGE_WRITE |PAGE_PRESENT;// request a new page from the process memory 
 			
-}//if page directory not present 
-		else {
+}//if  
+		else {// inidiactes a missing page table i.e. missing page directory entry 
+		
+			current_page_directory[page_direct_addr] = (unsigned long)((kernel_mem_pool->get_frames(PAGE_DIRECTORY_FRAME_SIZE)*PAGE_SIZE) | PAGE_WRITE |  PAGE_PRESENT);//used to request a new PAGE DIRECTORY ENTRY 
+			page_table = (unsigned long *)(current_page_directory[page_direct_addr]&EXCLUDE_LAST_12_BITS);//get the page table of the missing one from the CR3 address. same as above 
+                        for (int i=0;i<1024;i++){
 
+				page_table[i]= user_level_mask | PAGE_LEVEL_USER;//fills the page table entries by default to user level pages. 
+}//for i =0 to 1024
+			page_table[page_table_addr & PAGE_TABLE_MASK] = (PageTable::process_mem_pool->get_frames(PAGE_DIRECTORY_FRAME_SIZE)*PAGE_SIZE) | PAGE_WRITE |PAGE_PRESENT;//used to request a new PAGE TABLE ENTRY at the address where fault occured. address taken from CR3
 			
 
 
