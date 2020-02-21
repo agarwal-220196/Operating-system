@@ -10,6 +10,13 @@
 #define PAGE_WRITE   2 // because page write option is represented by the bit 1
 #define PAGE_LEVEL_USER 4 // bit 2 defines the user level or the kernel level
 
+#define PAGE_DIRECT_ADDR	22// as per the frame of address. 10+10+12 (direc+table+info)
+#define PAGE_TABLE_ADDR		12// as per the frame of address. 10+10+12 (direc+table+info)
+#define EXCLUDE_LAST_12_BITS	0xFFFFF000 //excluding the last 12 bits of info/offset
+#define PAGE_TABLE_MASK		0x3FF // used to get only the 10 bits will be used in page fault handler
+
+
+
 /*
 bit 0 - high-->page present; low-->page not present 
 bit 1 - high-->read and write; low-->read only 
@@ -100,7 +107,51 @@ void PageTable::enable_paging()
 
 void PageTable::handle_fault(REGS * _r)
 {
-  assert(false);
-  Console::puts("handled page fault\n");
+	//assert(false);
+	// as defined in the machine.H file, we define the error code in err_code variable. 
+	
+	unsigned long * current_page_directory = (unsigned long *) read_cr3();//contains the page directory base address.
+	unsigned long page_address = read_cr2();//contains the 32 bit address that casued the page fault 
+
+/*
+As defined in the X86 the addresses are as follows 
+
+10 bits for page directory 	10 bits for pages 	12 bits info offset 
+i.e.	0000 0000 00		00 0000	0000		0000 0000 0000 
+*/
+
+//EXCLUDE_LAST_12_BITS
+//PAGE_TABLE_MASK
+	
+//separating the two address
+ 	unsigned long page_direct_addr = page_address >> PAGE_DIRECT_ADDR;
+	unsigned long page_table_addr  = page_address >> PAGE_TABLE_ADDR;
+		
+	unsigned long * page_table = NULL;
+	unsigned long error_code   = _r->err_code;
+
+	unsigned long  user_level_mask = 0; //will be used to or the data with page_level
+
+
+	if ((error_code & PAGE_PRESENT)==0){
+
+		if ((current_page_directory[page_direct_addr] & PAGE_PRESENT)==1){
+			
+			page_table = (unsigned long *)(current_page_directory[page_direct_addr]&EXCLUDE_LAST_12_BITS);
+	
+/*PAGE_PRESENT 1 // because this is represented by the bit 0
+#define PAGE_WRITE   2 // because page write option is represented by the bit 1
+#define PAGE_LEVEL_USER 4 // */	
+			page_table[page_table_addr & PAGE_TABLE_MASK] = (PageTable::process_mem_pool->get_frames(PAGE_DIRECTORY_FRAME_SIZE)*PAGE_SIZE) | PAGE_WRITE |PAGE_PRESENT;
+			
+}//if page directory not present 
+		else {
+
+			
+
+
+}//else of page directory 
+}//if error code & present =1
+	Console::puts("handled page fault\n");
 }
 
