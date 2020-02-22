@@ -48,7 +48,7 @@
 
 #define FAULT_ADDR (4 MB)
 /* used in the code later as address referenced to cause page faults. */
-#define NACCESS ((1 MB) / 4)
+#define NACCESS ((4 MB) / 4)
 /* NACCESS integer access (i.e. 4 bytes in each access) are made starting at address FAULT_ADDR */
 
 /*--------------------------------------------------------------------------*/
