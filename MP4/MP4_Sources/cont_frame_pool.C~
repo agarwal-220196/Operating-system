@@ -396,7 +396,6 @@ void ContFramePool::release_frames(unsigned long _first_frame_no)
 	
 		if(pool_current->next_fame_pool==NULL){
 			Console::puts("No frame found to be released \n");//no frame found
-			assert(false);// additional improvement in cont_frame_pool.C that stops the execution in case a release is called when there are no frames to be released. 
 			return;
 }//if 
 		else{
