@@ -17,7 +17,7 @@
 /* DEFINES */
 /*--------------------------------------------------------------------------*/
 
-#define MAX_VIRTUAL_MEMORY_POOLS 10	//maximum number of pools that can be allocated. 
+#define MAX_VIRTUAL_MEMORY_POOLS 10
 
 /* -- (none) -- */
 
