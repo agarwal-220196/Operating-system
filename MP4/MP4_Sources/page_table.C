@@ -152,8 +152,8 @@ i.e.	0000 0000 00		00 0000	0000		0000 0000 0000
 
 	if ((error_code & PAGE_PRESENT)==0){
 
-//disabling pool check to check page table implementation, need to modify this later
-	int pool_index = 1;// will be used to access the pool of that page table. 
+
+	int pool_index = -1;// will be used to access the pool of that page table. 
 	
 	VMPool ** virtualmemory_pool = current_page_table->registered_vm_pool;
 
