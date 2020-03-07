@@ -55,11 +55,11 @@ PageTable::PageTable()
 	//assert(false);
 	
 
-	page_directory = (unsigned long*)(kernel_mem_pool->get_frames(PAGE_DIRECTORY_FRAME_SIZE)*PAGE_SIZE);//this will assign the page directory space. 
+	page_directory = (unsigned long*)(process_mem_pool->get_frames(PAGE_DIRECTORY_FRAME_SIZE)*PAGE_SIZE);//this will assign the page directory space. CHANGING IT TO PROCESS MEMORY SPACE AS SPECIFIED IN MP4 
 
 	unsigned long address_value = 0;// it will be used to set reset the lower bits of entries
 
-	unsigned long * page_table_mapped_directly = (unsigned long *)(kernel_mem_pool->get_frames(PAGE_DIRECTORY_FRAME_SIZE)*PAGE_SIZE);
+	unsigned long * page_table_mapped_directly = (unsigned long *)(process_mem_pool->get_frames(PAGE_DIRECTORY_FRAME_SIZE)*PAGE_SIZE);//CHANGING IT TO PROCESS MEMORY SPACE AS SPECIFIED IN MP4
 
 	unsigned long number_of_shared_frames = (PageTable::shared_size/PAGE_SIZE);//indicates the number of frames for shared memory spaces.
 
@@ -84,6 +84,14 @@ PageTable::PageTable()
 	page_directory[i]=address_value | PAGE_WRITE;// marking it non present since it is not available yet 
 	
 }//for i=1
+
+	page_directory[number_of_shared_frames-1] = (unsigned long)(page_directory) | PAGE_WRITE | PAGE_PRESENT;//marking the last entry as present (recursive page table) 1023
+	
+	registered_vm_pool_count=0;//since when this constructor is called, we are not assiging any space, we are doing it in the register_pool function 	
+
+	for (int i=0; i<MAX_VIRTUAL_MEMORY_POOLS;i++){
+	registered_vm_pool[i] = NULL;//reason same as above for marking it will NULL 
+}//for i=0
 
 	Console::puts("Constructed Page Table object\n");
 }
@@ -110,8 +118,10 @@ void PageTable::handle_fault(REGS * _r)
 	//assert(false);
 	// as defined in the machine.H file, we define the error code in err_code variable. 
 	
-	unsigned long * current_page_directory = (unsigned long *) read_cr3();//contains the page directory base address.
+//we need to do recursive lookup to get the address
+	//unsigned long * current_page_directory = (unsigned long *) read_cr3();//contains the page directory base address.
 	unsigned long page_address = read_cr2();//contains the 32 bit address that casued the page fault 
+
 
 /*
 As defined in the X86 the addresses are as follows 
@@ -123,6 +133,7 @@ i.e.	0000 0000 00		00 0000	0000		0000 0000 0000
 //EXCLUDE_LAST_12_BITS
 //PAGE_TABLE_MASK
 	
+
 //separating the two address
  	unsigned long page_direct_addr = page_address >> PAGE_DIRECT_ADDR;
 	unsigned long page_table_addr  = page_address >> PAGE_TABLE_ADDR;
@@ -133,19 +144,54 @@ i.e.	0000 0000 00		00 0000	0000		0000 0000 0000
 	unsigned long  user_level_mask = 0; //will be used to or the data with page_level
 
 
+//recursive lookup
+
+	unsigned long * current_page_directory = (unsigned long *) 0xFFFFF000; // 1023|1023|offset
+
+
+
 	if ((error_code & PAGE_PRESENT)==0){
+
+	int pool_index = -1;// will be used to access the pool of that page table. 
+	
+	VMPool ** virtualmemory_pool = current_page_table->registered_vm_pool;
+
+	for (int i=0;i<current_page_table->registered_vm_pool_count;i++){
+		
+		if (virtualmemory_pool[i]!=NULL){//if there exists such a pool then only enter
+			if (virtualmemory_pool[i]->is_legitimate(page_address)){//if the address belongs to that pool then only mark it as present. 
+				pool_index=i;
+				break;
+}//second if 
+
+}// if 
+
+}//for 
+	
+
+	assert(!(pool_index<0));// check if the pool_index is positive or negative. 
+//if the pool_index is negative then halt as the address that is a pagefault does not belong 
+//to any of the pools. 
+
+
 
 		if ((current_page_directory[page_direct_addr] & PAGE_PRESENT)==1){//indicates a missing page table entry
 			
-			page_table = (unsigned long *)(current_page_directory[page_direct_addr]&EXCLUDE_LAST_12_BITS);//exlude the offset 12 bits 
+			//page_table = (unsigned long *)(current_page_directory[page_direct_addr]&EXCLUDE_LAST_12_BITS);//exlude the offset 12 bits 
 		
+
+			page_table = (unsigned long *)(0xFFC00000 | (page_direct_addr<< PAGE_TABLE_ADDR));
+
 			page_table[page_table_addr & PAGE_TABLE_MASK] = (PageTable::process_mem_pool->get_frames(PAGE_DIRECTORY_FRAME_SIZE)*PAGE_SIZE) | PAGE_WRITE |PAGE_PRESENT;// request a new page from the process memory 
 			
 }//if  
 		else {// inidiactes a missing page table i.e. missing page directory entry 
 		
-			current_page_directory[page_direct_addr] = (unsigned long)((kernel_mem_pool->get_frames(PAGE_DIRECTORY_FRAME_SIZE)*PAGE_SIZE) | PAGE_WRITE |  PAGE_PRESENT);//used to request a new PAGE DIRECTORY ENTRY 
-			page_table = (unsigned long *)(current_page_directory[page_direct_addr]&EXCLUDE_LAST_12_BITS);//get the page table of the missing one from the CR3 address. same as above 
+			current_page_directory[page_direct_addr] = (unsigned long)((process_mem_pool->get_frames(PAGE_DIRECTORY_FRAME_SIZE)*PAGE_SIZE) | PAGE_WRITE |  PAGE_PRESENT);//used to request a new PAGE DIRECTORY ENTRY 
+			//page_table = (unsigned long *)(current_page_directory[page_direct_addr]&EXCLUDE_LAST_12_BITS);//get the page table of the missing one from the CR3 address. same as above 
+
+			page_table = (unsigned long *)(0xFFC00000| (page_direct_addr<< PAGE_TABLE_ADDR));
+		
                         for (int i=0;i<1024;i++){
 
 				page_table[i]= user_level_mask | PAGE_LEVEL_USER;//fills the page table entries by default to user level pages. 
@@ -158,4 +204,40 @@ i.e.	0000 0000 00		00 0000	0000		0000 0000 0000
 }//if error code & present =1
 	Console::puts("handled page fault\n");
 }
+
+void PageTable::register_pool(VMPool * _vm_pool)
+{
+
+	if (registered_vm_pool_count< MAX_VIRTUAL_MEMORY_POOLS){
+
+		registered_vm_pool[registered_vm_pool_count++]= _vm_pool;
+		Console::puts("VM pool is registered \n");
+
+}//if end 
+	else{
+		Console::puts("Virtual memory pools are full, cannot register \n");
+}//else end 
+
+}
+
+void PageTable::free_page(unsigned long _page_no){
+
+	unsigned long page_direct_addr = _page_no >> PAGE_DIRECT_ADDR;
+        unsigned long page_table_addr  = _page_no >> PAGE_TABLE_ADDR;
+        unsigned long * page_table = (unsigned long *)(0xFFC00000 | (page_direct_addr << PAGE_TABLE_ADDR));
+
+	unsigned long frame_number = page_table[page_table_addr & PAGE_TABLE_MASK] / (Machine::PAGE_SIZE);
+
+	process_mem_pool->release_frames(frame_number);
+
+	page_table[page_table_addr & PAGE_TABLE_MASK] = 0 | PAGE_WRITE;
+
+
+//FLUSH TLB 
+
+	unsigned long * current_page_directory = (unsigned long *)read_cr3();
+	write_cr3((unsigned long)current_page_directory); 
+
+}
+
 
