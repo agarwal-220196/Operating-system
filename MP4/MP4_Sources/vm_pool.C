@@ -1,8 +1,8 @@
 /*
  File: vm_pool.C
  
- Author:
- Date  :
+ Author:Sanket Vinod Agarwal 
+ Date  :03/10/2020
  
  */
 
@@ -48,8 +48,18 @@ VMPool::VMPool(unsigned long  _base_address,
                unsigned long  _size,
                ContFramePool *_frame_pool,
                PageTable     *_page_table) {
-    assert(false);
-    Console::puts("Constructed VMPool object.\n");
+	base_address = _base_address;
+	size = _size;
+	frame_pool = _frame_pool;
+	page_table = _page_table;
+	
+	region_number = 0;//initalize it with zero 
+
+	allocate_region = (struct allocate_region_ *)(base_address);
+
+	page_table->register_pool(this);
+
+	Console::puts("Constructed VMPool object.\n");
 }
 
 unsigned long VMPool::allocate(unsigned long _size) {
