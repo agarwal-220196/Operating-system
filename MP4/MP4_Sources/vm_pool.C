@@ -115,8 +115,45 @@ unsigned long VMPool::allocate(unsigned long _size) {
 }
 
 void VMPool::release(unsigned long _start_address) {
-    assert(false);
-    Console::puts("Released region of memory.\n");
+  //  assert(false);
+	int current_region_number = -1;
+
+//detecting the current region number 
+	for (int i=0; i<MAX_NUMBER_REGIONS;i++){
+
+		if (allocate_region[i].base_address==_start_address){
+	
+			current_region_number = i;
+			break;
+}
+
+}//end of for loop that detects the region number 
+	assert (!(current_region_number<0));//check if the region number is not less than zero
+
+
+	unsigned int allocated_pages = ((allocate_region[current_region_number].size) / (Machine::PAGE_SIZE));
+
+
+	for (int i = 0; i<allocated_pages;i++ ){//this for loop will free all the pages in the current_region_number.
+
+		page_table->free_page(_start_address);
+		_start_address += Machine::PAGE_SIZE;
+}//allocated pages over
+
+
+
+//if the region pages are removed, we need to reduce the number of regions allocated and move the lower region number to upper one. 
+
+	for (int i = current_region_number;i<region_number-1;i++){
+
+		allocate_region[i] = allocate_region[i+1];
+}// end of regions 
+
+	region_number--;
+
+	page_table->load();
+
+   	 Console::puts("Released region of memory.\n");
 }
 
 bool VMPool::is_legitimate(unsigned long _address) {
