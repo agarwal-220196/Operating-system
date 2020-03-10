@@ -55,16 +55,63 @@ VMPool::VMPool(unsigned long  _base_address,
 	
 	region_number = 0;//initalize it with zero 
 
-	allocate_region = (struct allocate_region_ *)(base_address);
+	allocate_region = (struct allocate_region_ *)(base_address);//get the base address
 
-	page_table->register_pool(this);
+	page_table->register_pool(this);//register the pool number region implemented in pagetable.C
 
 	Console::puts("Constructed VMPool object.\n");
 }
 
 unsigned long VMPool::allocate(unsigned long _size) {
-    assert(false);
-    Console::puts("Allocated region of memory.\n");
+    //assert(false);
+
+	unsigned long address;
+
+	if (size==0){
+		
+		Console::puts("Allocation of size 0 is invalid");
+		return 0;	
+}//if size ==1
+
+	assert (region_number< MAX_NUMBER_REGIONS);//check if the number of regions allocated is less than the number of max regions. 
+
+	unsigned long number_of_frames_required = _size / (Machine::PAGE_SIZE);//total number of frames required for the size requested. 
+
+	unsigned long out_of_frame_size = _size % (Machine::PAGE_SIZE);//check if the requested size if in line with the frame size or not  
+
+	if (out_of_frame_size > 0){
+	
+		number_of_frames_required ++ ;//additional frame required if the size is not a multiple of frame number 
+}//out_of_frame_size =  0
+
+	if (region_number==0){
+
+//since the first page is used to maintain the information about allocated region, we start the allocation from next page number. 
+
+		address = base_address;
+		
+		allocate_region[region_number].base_address = address + Machine::PAGE_SIZE;
+		allocate_region[region_number].size = number_of_frames_required*(Machine::PAGE_SIZE);
+
+		region_number++;
+		Console::puts("Allocated region of memory.\n");
+		return (address + Machine::PAGE_SIZE);
+
+}//if region_number!=0 
+	else {//if any previous region is allocated then assign the new region after the end of previous region 
+
+		address = allocate_region[region_number-1].base_address + allocate_region[region_number-1].size;
+
+}//end of else for region_number!=0	
+
+	allocate_region[region_number].base_address = address;
+
+	allocate_region[region_number].size = number_of_frames_required*(Machine::PAGE_SIZE);
+
+	region_number++;
+    	Console::puts("Allocated region of memory.\n");
+
+	return address;
 }
 
 void VMPool::release(unsigned long _start_address) {
