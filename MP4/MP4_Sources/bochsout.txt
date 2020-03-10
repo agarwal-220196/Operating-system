@@ -31,7 +31,7 @@
 00000000000i[      ]   SB16 support: no
 00000000000i[      ]   USB support: no
 00000000000i[      ]   VGA extension support: vbe
-00000000000i[MEM0  ] allocated memory at 0x7f7fb1afd010. after alignment, vector=0x7f7fb1afe000
+00000000000i[MEM0  ] allocated memory at 0x7f37eb525010. after alignment, vector=0x7f37eb526000
 00000000000i[MEM0  ] 32.00MB
 00000000000i[MEM0  ] mem block size = 0x00100000, blocks=32
 00000000000i[MEM0  ] rom at 0xfffe0000/131072 ('BIOS-bochs-latest')
@@ -139,6 +139,7 @@
 00000777700i[BIOS  ] Found 1 cpu(s)
 00000794001i[BIOS  ] bios_table_addr: 0x000fb778 end=0x000fcc00
 00001252875i[PCI   ] i440FX PMC write to PAM register 59 (TLB Flush)
+00001664383i[XGUI  ] charmap update. Font Height is 16
 00001712362i[P2ISA ] PCI IRQ routing: PIRQA# set to 0x0b
 00001712409i[P2ISA ] PCI IRQ routing: PIRQB# set to 0x09
 00001712456i[P2ISA ] PCI IRQ routing: PIRQC# set to 0x0b
@@ -163,30 +164,30 @@
 00001773523i[BIOS  ] ACPI tables: RSDP addr=0x000fb970 ACPI DATA addr=0x01ff0000 size=0x9d8
 00001793056i[PCI   ] i440FX PMC write to PAM register 59 (TLB Flush)
 00001794068i[BIOS  ] bios_table_cur_addr: 0x000fb994
-00010368831i[XGUI  ] charmap update. Font Height is 16
-12155503011i[BIOS  ] Booting from 0000:7c00
-12176958947i[XGUI  ] charmap update. Font Height is 16
-12291467462i[XGUI  ] charmap update. Font Height is 16
-12969808000p[XGUI  ] >>PANIC<< POWER button turned off.
-12969808000i[CPU0  ] CPU is in protected mode (active)
-12969808000i[CPU0  ] CS.mode = 32 bit
-12969808000i[CPU0  ] SS.mode = 32 bit
-12969808000i[CPU0  ] EFER   = 0x00000000
-12969808000i[CPU0  ] | EAX=00000000  EBX=001040a8  ECX=00000f00  EDX=000003d4
-12969808000i[CPU0  ] | ESP=00106dd0  EBP=00106dd0  ESI=000263d3  EDI=000263df
-12969808000i[CPU0  ] | IOPL=0 id vip vif ac vm rf nt of df if tf sf ZF af PF cf
-12969808000i[CPU0  ] | SEG sltr(index|ti|rpl)     base    limit G D
-12969808000i[CPU0  ] |  CS:0008( 0001| 0|  0) 00000000 ffffffff 1 1
-12969808000i[CPU0  ] |  DS:0010( 0002| 0|  0) 00000000 ffffffff 1 1
-12969808000i[CPU0  ] |  SS:0010( 0002| 0|  0) 00000000 ffffffff 1 1
-12969808000i[CPU0  ] |  ES:0010( 0002| 0|  0) 00000000 ffffffff 1 1
-12969808000i[CPU0  ] |  FS:0010( 0002| 0|  0) 00000000 ffffffff 1 1
-12969808000i[CPU0  ] |  GS:0010( 0002| 0|  0) 00000000 ffffffff 1 1
-12969808000i[CPU0  ] | EIP=001001e7 (001001e7)
-12969808000i[CPU0  ] | CR0=0xe0000011 CR2=0x00400000
-12969808000i[CPU0  ] | CR3=0x00400000 CR4=0x00000000
-12969808000i[CPU0  ] 0x001001e7>> jmp .-2 (0x001001e7) : EBFE
-12969808000i[CMOS  ] Last time is 946684442 (Fri Dec 31 17:54:02 1999)
-12969808000i[XGUI  ] Exit
-12969808000i[      ] restoring default signal behavior
-12969808000i[SIM   ] quit_sim called with exit code 1
+10523686631i[BIOS  ] Booting from 0000:7c00
+10534180991i[XGUI  ] charmap update. Font Height is 16
+10604447787i[XGUI  ] charmap update. Font Height is 16
+10619677748i[XGUI  ] charmap update. Font Height is 16
+13590084000p[XGUI  ] >>PANIC<< POWER button turned off.
+13590084000i[CPU0  ] CPU is in protected mode (active)
+13590084000i[CPU0  ] CS.mode = 32 bit
+13590084000i[CPU0  ] SS.mode = 32 bit
+13590084000i[CPU0  ] EFER   = 0x00000000
+13590084000i[CPU0  ] | EAX=00000000  EBX=001040a8  ECX=00000f00  EDX=000003d4
+13590084000i[CPU0  ] | ESP=00106ef0  EBP=00106f08  ESI=000263d3  EDI=000263df
+13590084000i[CPU0  ] | IOPL=0 id vip vif ac vm rf nt of df IF tf sf ZF af PF cf
+13590084000i[CPU0  ] | SEG sltr(index|ti|rpl)     base    limit G D
+13590084000i[CPU0  ] |  CS:0008( 0001| 0|  0) 00000000 ffffffff 1 1
+13590084000i[CPU0  ] |  DS:0010( 0002| 0|  0) 00000000 ffffffff 1 1
+13590084000i[CPU0  ] |  SS:0010( 0002| 0|  0) 00000000 ffffffff 1 1
+13590084000i[CPU0  ] |  ES:0010( 0002| 0|  0) 00000000 ffffffff 1 1
+13590084000i[CPU0  ] |  FS:0010( 0002| 0|  0) 00000000 ffffffff 1 1
+13590084000i[CPU0  ] |  GS:0010( 0002| 0|  0) 00000000 ffffffff 1 1
+13590084000i[CPU0  ] | EIP=00100a17 (00100a17)
+13590084000i[CPU0  ] | CR0=0xe0000011 CR2=0x40005000
+13590084000i[CPU0  ] | CR3=0x00400000 CR4=0x00000000
+13590084000i[CPU0  ] 0x00100a17>> jmp .-2 (0x00100a17) : EBFE
+13590084000i[CMOS  ] Last time is 946684597 (Fri Dec 31 17:56:37 1999)
+13590084000i[XGUI  ] Exit
+13590084000i[      ] restoring default signal behavior
+13590084000i[SIM   ] quit_sim called with exit code 1
