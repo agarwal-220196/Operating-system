@@ -18,7 +18,7 @@
 /* DEFINES */
 /*--------------------------------------------------------------------------*/
 
-#define MAX_NUMBER_REGIONS 500 //as defined in the handout document
+#define MAX_NUMBER_REGIONS 512 //as defined in the handout document
 
 /*--------------------------------------------------------------------------*/
 /* INCLUDES */
