@@ -170,7 +170,7 @@ i.e.	0000 0000 00		00 0000	0000		0000 0000 0000
 }//for 
 	
 
-	assert(!(pool_index<0));// check if the pool_index is positive or negative. 
+	//assert(!(pool_index<0));// check if the pool_index is positive or negative. 
 //if the pool_index is negative then halt as the address that is a pagefault does not belong 
 //to any of the pools. 
 

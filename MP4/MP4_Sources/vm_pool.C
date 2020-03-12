@@ -62,7 +62,7 @@ VMPool::VMPool(unsigned long  _base_address,
 	Console::puts("Constructed VMPool object.\n");
 }
 
-unsigned long VMPool::allocate(unsigned long _size) {
+unsigned long VMPool::allocate(unsigned long _size) {//100,200,300,400....5000
     //assert(false);
 
 	unsigned long address;
@@ -77,7 +77,7 @@ unsigned long VMPool::allocate(unsigned long _size) {
 
 	unsigned long number_of_frames_required = _size / (Machine::PAGE_SIZE);//total number of frames required for the size requested. 
 
-	unsigned long out_of_frame_size = _size % (Machine::PAGE_SIZE);//check if the requested size if in line with the frame size or not  
+	unsigned long out_of_frame_size = _size % (Machine::PAGE_SIZE);//check if the requested size if in line with the frame size or not
 
 	if (out_of_frame_size > 0){
 	
