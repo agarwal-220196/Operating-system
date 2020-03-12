@@ -31,7 +31,7 @@
 
 #define FAULT_ADDR (4 MB)
 /* used in the code later as address referenced to cause page faults. */
-#define NACCESS ((26 MB) / 4)
+#define NACCESS ((1 MB) / 4)
 /* NACCESS integer access (i.e. 4 bytes in each access) are made starting at address FAULT_ADDR */
 
 /*--------------------------------------------------------------------------*/
@@ -216,7 +216,7 @@ int main() {
     Console::puts("Hello World!\n");
 
     /* Comment out the following line to test the VM Pools */
-#define _TEST_PAGE_TABLE_
+//#define _TEST_PAGE_TABLE_
 
 #ifdef _TEST_PAGE_TABLE_
 
@@ -242,9 +242,9 @@ int main() {
     Console::puts("of the VM Pool memory allocator.\n");
     Console::puts("Please be patient...\n");
     Console::puts("Testing the memory allocation on code_pool...\n");
-    GenerateVMPoolMemoryReferences(&code_pool, 50, 100);
+    GenerateVMPoolMemoryReferences(&code_pool, 100, 100);
     Console::puts("Testing the memory allocation on heap_pool...\n");
-    GenerateVMPoolMemoryReferences(&heap_pool, 50, 100);
+    GenerateVMPoolMemoryReferences(&heap_pool, 100, 100);
 
 #endif
 
