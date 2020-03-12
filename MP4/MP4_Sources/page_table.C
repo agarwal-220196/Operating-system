@@ -146,7 +146,7 @@ i.e.	0000 0000 00		00 0000	0000		0000 0000 0000
 
 //recursive lookup
 
-	unsigned long * current_page_directory = (unsigned long *) 0xFFFFF000; // 1023|1023|offset
+	unsigned long * current_page_directory = (unsigned long *) 0xFFFFF000; // default directory location as mentioned in slide 
 
 
 
