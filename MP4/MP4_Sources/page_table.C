@@ -209,29 +209,29 @@ i.e.	0000 0000 00		00 0000	0000		0000 0000 0000
 void PageTable::register_pool(VMPool * _vm_pool)
 {
 
-	if (registered_vm_pool_count< MAX_VIRTUAL_MEMORY_POOLS){
+	if (registered_vm_pool_count< MAX_VIRTUAL_MEMORY_POOLS){// check if number of pools less than the number of max pools allowed 
 
 		registered_vm_pool[registered_vm_pool_count++]= _vm_pool;
 		Console::puts("VM pool is registered \n");
 
 }//if end 
 	else{
-		Console::puts("Virtual memory pools are full, cannot register \n");
+		Console::puts("Virtual memory pools are full, cannot register \n");// if less number of pools then do not register. 
 }//else end 
 
 }
 
 void PageTable::free_page(unsigned long _page_no){
 
-	unsigned long page_direct_addr = _page_no >> PAGE_DIRECT_ADDR;
-        unsigned long page_table_addr  = _page_no >> PAGE_TABLE_ADDR;
-        unsigned long * page_table = (unsigned long *)(0xFFC00000 | (page_direct_addr << PAGE_TABLE_ADDR));
+	unsigned long page_direct_addr = _page_no >> PAGE_DIRECT_ADDR;// get the page directory 
+        unsigned long page_table_addr  = _page_no >> PAGE_TABLE_ADDR;//get the page table address 
+        unsigned long * page_table = (unsigned long *)(0xFFC00000 | (page_direct_addr << PAGE_TABLE_ADDR));//recursive page table location 
 
-	unsigned long frame_number = page_table[page_table_addr & PAGE_TABLE_MASK] / (Machine::PAGE_SIZE);
+	unsigned long frame_number = page_table[page_table_addr & PAGE_TABLE_MASK] / (Machine::PAGE_SIZE);//get the frame number using the recursive logic 
 
-	process_mem_pool->release_frames(frame_number);
+	process_mem_pool->release_frames(frame_number);//call the release frame number 
 
-	page_table[page_table_addr & PAGE_TABLE_MASK] = 0 | PAGE_WRITE;
+	page_table[page_table_addr & PAGE_TABLE_MASK] = 0 | PAGE_WRITE;// mark the PTE empty. 
 
 
 //FLUSH TLB 
