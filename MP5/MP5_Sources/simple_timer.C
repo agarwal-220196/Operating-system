@@ -24,7 +24,7 @@
 #include "console.H"
 #include "interrupts.H"
 #include "simple_timer.H"
-
+#include "thread.H"
 /*--------------------------------------------------------------------------*/
 /* CONSTRUCTOR */
 /*--------------------------------------------------------------------------*/
@@ -58,12 +58,21 @@ void SimpleTimer::handle_interrupt(REGS *_r) {
     ticks++;
 
     /* Whenever a second is over, we update counter accordingly. */
-    if (ticks >= hz )
+   /* if (ticks >= hz )
     {
         seconds++;
         ticks = 0;
         Console::puts("One second has passed\n");
-    }
+    }*/
+
+// using the time quantum of 50 ms to switch the thread in round robin fashion 
+
+	if (ticks>=hz/20){//since hz is defined as 100 and we need 50 ticks
+	
+		ticks=0;
+		Console::puts("one quantum is over, we need to yield \n");
+		Thread::yield_thread();
+	}
 }
 
 
