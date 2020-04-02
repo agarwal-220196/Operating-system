@@ -62,7 +62,7 @@ class round_robin_queue{
 
 		thread 				= next->thread;// get the next thread in queue as the head 
 		round_robin_queue * delete_node = next; // current node to be deleted. 
-		next 				= next->next // get the pointer of third node which becomes the second node later. 
+		next 				= next->next; // get the pointer of third node which becomes the second node later. 
 		delete delete_node;
 
 		} else {
