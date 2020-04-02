@@ -128,8 +128,21 @@ void InterruptHandler::dispatch_interrupt(REGS * _r) {
   }
   else {
     /* -- HANDLE THE INTERRUPT */
-    handler->handle_interrupt(_r);
-  }
+  //  handler->handle_interrupt(_r);
+/*
+I have implemented the yield thread function in the handle_interrup function.
+In that yield function, we do the yield CPU task and load  a new thread from the round_robin_queue. 
+
+This loading of new thread disables the interrupt and thus the following EOI messages would not be sent to the appropriate ports if we call the handle_interrupt over here. 
+
+Thus, I have moved the handle_interrupt functions after sending the EOI message. This works for now!  
+
+*/
+
+
+
+
+//  }
 
   /* This is an interrupt that was raised by the interrupt controller. We need 
        to send and end-of-interrupt (EOI) signal to the controller after the 
@@ -144,7 +157,8 @@ void InterruptHandler::dispatch_interrupt(REGS * _r) {
 
   /* Send an EOI message to the master interrupt controller. */
   Machine::outportb(0x20, 0x20);
-    
+    handler->handle_interrupt(_r);
+}
 }
 
 void InterruptHandler::register_handler(unsigned int        _irq_code,

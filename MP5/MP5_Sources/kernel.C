@@ -23,7 +23,7 @@
 
 /* -- COMMENT/UNCOMMENT THE FOLLOWING LINE TO EXCLUDE/INCLUDE SCHEDULER CODE */
 
-//#define _USES_SCHEDULER_
+#define _USES_SCHEDULER_
 /* This macro is defined when we want to force the code below to use
    a scheduler.
    Otherwise, no scheduler is used, and the threads pass control to each
@@ -33,7 +33,7 @@
 
 /* -- UNCOMMENT THE FOLLOWING LINE TO MAKE THREADS TERMINATING */
 
-//#define _TERMINATING_FUNCTIONS_
+#define _TERMINATING_FUNCTIONS_
 /* This macro is defined when we want the thread functions to return, and so
    terminate their thread.
    Otherwise, the thread functions don't return, and the threads run forever.
@@ -152,7 +152,7 @@ void fun1() {
         for (int i = 0; i < 10; i++) {
             Console::puts("FUN 1: TICK ["); Console::puti(i); Console::puts("]\n");
         }
-        pass_on_CPU(thread2);
+    //    pass_on_CPU(thread2); we do not need this function call since we are doing a round robin queue that will swithc the thread every 50ms
     }
 }
 
@@ -171,7 +171,7 @@ void fun2() {
         for (int i = 0; i < 10; i++) {
             Console::puts("FUN 2: TICK ["); Console::puti(i); Console::puts("]\n");
         }
-        pass_on_CPU(thread3);
+    //    pass_on_CPU(thread3); same reason as above
     }
 }
 
@@ -184,7 +184,7 @@ void fun3() {
         for (int i = 0; i < 10; i++) {
 	    Console::puts("FUN 3: TICK ["); Console::puti(i); Console::puts("]\n");
         }
-        pass_on_CPU(thread4);
+  //      pass_on_CPU(thread4); same reason as above 
     }
 }
 
@@ -197,7 +197,7 @@ void fun4() {
         for (int i = 0; i < 10; i++) {
 	    Console::puts("FUN 4: TICK ["); Console::puti(i); Console::puts("]\n");
         }
-        pass_on_CPU(thread1);
+//        pass_on_CPU(thread1); same reason as above 
     }
 }
 
