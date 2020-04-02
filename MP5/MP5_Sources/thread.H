@@ -85,6 +85,8 @@ public:
     static Thread * CurrentThread();
     /* Returns the currently running thread. NULL if no thread has started 
        yet. */
+
+     static void yield_thread(); // this will be called in simpletimer after every quantum of time.
 };
 
 #endif
