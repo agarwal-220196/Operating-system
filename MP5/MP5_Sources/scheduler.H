@@ -13,14 +13,16 @@
 /* DEFINES */
 /*--------------------------------------------------------------------------*/
 
-/* -- (none) -- */
+#ifndef NULL
+#define NULL 0L
+#endif 
 
 /*--------------------------------------------------------------------------*/
 /* INCLUDES */
 /*--------------------------------------------------------------------------*/
 
 #include "thread.H"
-
+#include "round_robin_queue.H"
 /*--------------------------------------------------------------------------*/
 /* !!! IMPLEMENTATION HINT !!! */
 /*--------------------------------------------------------------------------*/
@@ -58,6 +60,11 @@ class Scheduler {
 
   /* The scheduler may need private members... */
   
+//defining some members and variables for round_robin_queue
+
+	round_robin_queue ready_queue;
+	int size_of_queue;
+
 public:
 
    Scheduler();
