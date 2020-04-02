@@ -46,22 +46,48 @@
 /*--------------------------------------------------------------------------*/
 
 Scheduler::Scheduler() {
-  assert(false);
-  Console::puts("Constructed Scheduler.\n");
+//  assert(false);
+	size_of_queue = 0; // at the start initializing the queue size to be zero
+	Console::puts("Constructed Scheduler.\n");
 }
 
 void Scheduler::yield() {
-  assert(false);
+//  assert(false);
+	if (size_of_queue==0){
+	// that is no other thread is available to be executed. 
+		Console::puts("No other thread is available and the queue is empty \n");
+	}else {
+		size_of_queue--;// reduce the queue size by 1 since we will be removing one of the thread form the queue and placing it in the CPU
+
+		Thread* new_thread = ready_queue.dequeue();// that is remove the top of queue thread and place it in the new_thread variable. 
+		
+	// now load this new thread obtained from queue into the cPU by calling the dispatch function 
+		Thread::dispatch_to (new_thread);
+	}
 }
 
 void Scheduler::resume(Thread * _thread) {
-  assert(false);
+  //assert(false);
+	ready_queue.enqueue_thread(_thread);// add the thread obtained in the argument to the queue.
+	size_of_queue++;
 }
 
 void Scheduler::add(Thread * _thread) {
-  assert(false);
+  //assert(false);
+
+	ready_queue.enqueue_thread(_thread);
+	size_of_queue++; //same function as the ready queue. 
 }
 
 void Scheduler::terminate(Thread * _thread) {
-  assert(false);
+//  assert(false);
+// the idea is to check all the threads in the queue with the thread to be terminated. if a matching thread is found, then it is not added back and the queue size is reduced. If it is not matched then it adds back to the queue. 
+	for (int i=0; i<size_of_queue;i++){
+		Thread * top_thread = ready_queue.dequeue();
+		if (top_thread->ThreadId() == _thread->ThreadId()){
+			size_of_queue--;
+		}else{
+			ready_queue.enqueue_thread(top_thread);
+		}
+	}
 }
