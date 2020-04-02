@@ -32,7 +32,7 @@
 #include "console.H"
 
 #include "frame_pool.H"
-
+#include "scheduler.H"
 #include "thread.H"
 
 #include "threads_low.H"
@@ -40,7 +40,7 @@
 /*--------------------------------------------------------------------------*/
 /* EXTERNS */
 /*--------------------------------------------------------------------------*/
-
+extern Scheduler* SYSTEM_SCHEDULER;//will be used to call scheduler functions 
 Thread * current_thread = 0;
 /* Pointer to the currently running thread. This is used by the scheduler,
    for example. */
@@ -73,16 +73,21 @@ static void thread_shutdown() {
        This is a bit complicated because the thread termination interacts with the scheduler.
      */
 
-    assert(false);
+    //assert(false);
     /* Let's not worry about it for now. 
        This means that we should have non-terminating thread functions. 
     */
+	SYSTEM_SCHEDULER->terminate(Thread::CurrentThread());// close the currently running thread if this is called 
+	delete current_thread; // free up space
+	SYSTEM_SCHEDULER->yield();// remove from cpu 
 }
 
 static void thread_start() {
      /* This function is used to release the thread for execution in the ready queue. */
     
      /* We need to add code, but it is probably nothing more than enabling interrupts. */
+	Machine::enable_interrupts();// used for counting timers
+
 }
 
 void Thread::setup_context(Thread_Function _tfunction){
@@ -208,4 +213,11 @@ void Thread::dispatch_to(Thread * _thread) {
 Thread * Thread::CurrentThread() {
 /* Return the currently running thread. */
     return current_thread;
+}
+
+void Thread::yield_thread (){
+
+	// we need to bring the currently executing thread at the end of round_robin_queue and yield the CPU over here
+	SYSTEM_SCHEDULER->resume(Thread::CurrentThread());// add the current to end of queue
+	SYSTEM_SCHEDULER->yield();// free the CPU 
 }
