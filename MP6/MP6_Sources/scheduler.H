@@ -65,7 +65,7 @@ class Scheduler {
 
 	round_robin_queue ready_queue;
 	int size_of_queue;
-	BlockingDisk *block_disk // will be used to access the different methods like is_ready 
+	BlockingDisk *block_disk; // will be used to access the different methods like is_ready 
 
 public:
 

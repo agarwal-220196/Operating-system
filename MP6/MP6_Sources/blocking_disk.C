@@ -25,7 +25,7 @@
 #include "scheduler.H"
 #include "thread.H"
 
-extern Scheduler *SYSTEM_SCHEDULER // will be used to call different functions of scheduler class
+extern Scheduler *SYSTEM_SCHEDULER; // will be used to call different functions of scheduler class
 /*--------------------------------------------------------------------------*/
 /* CONSTRUCTOR */
 /*--------------------------------------------------------------------------*/
