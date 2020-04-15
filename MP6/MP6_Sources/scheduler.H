@@ -23,6 +23,7 @@
 
 #include "thread.H"
 #include "round_robin_queue.H"
+#include "blocking_disk.H"
 /*--------------------------------------------------------------------------*/
 /* !!! IMPLEMENTATION HINT !!! */
 /*--------------------------------------------------------------------------*/
@@ -64,6 +65,7 @@ class Scheduler {
 
 	round_robin_queue ready_queue;
 	int size_of_queue;
+	BlockingDisk *block_disk // will be used to access the different methods like is_ready 
 
 public:
 
@@ -95,6 +97,8 @@ public:
    /* Remove the given thread from the scheduler in preparation for destruction
       of the thread. 
       Graciously handle the case where the thread wants to terminate itself.*/
+
+	void pass_kernel_disk_object_to_scheduler (BlockingDisk *disk_object);
   
 };
 	
