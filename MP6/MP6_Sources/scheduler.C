@@ -48,21 +48,30 @@
 Scheduler::Scheduler() {
 //  assert(false);
 	size_of_queue = 0; // at the start initializing the queue size to be zero
+	this->block_disk = NULL; // initialize the block disk pointer to null initially. 
 	Console::puts("Constructed Scheduler.\n");
 }
 
 void Scheduler::yield() {
 //  assert(false);
-	if (size_of_queue==0){
-	// that is no other thread is available to be executed. 
-		Console::puts("No other thread is available and the queue is empty \n");
-	}else {
-		size_of_queue--;// reduce the queue size by 1 since we will be removing one of the thread form the queue and placing it in the CPU
+	// give priority to the thread waiting in the disk_queue. if not that move to the queue of normal threads that are not waiting for I/O operations. 
+	if( (block_disk!=NULL) && (block_disk->is_ready()) && (block_disk->disk_queue_size != 0) ){//if disk_queue has a thread then process that 
+		Thread *top_thread_disk_queue = block_disk->disk_queue->dequeue();//take the thread from queue
+		block_disk->disk_queue_size--; //reduce the size of the queue
+		Thread::dispatch_to(top_thread_disk_queue);// send the thread for execution. 
+	
+	}else{//no thread in the disk queue
+		if (size_of_queue==0){
+		// that is no other thread is available to be executed. 
+			Console::puts("No other thread is available and the queue is empty \n");
+		}else {
+			size_of_queue--;// reduce the queue size by 1 since we will be removing one of the thread form the queue and placing it in the CPU
 
-		Thread* new_thread = ready_queue.dequeue();// that is remove the top of queue thread and place it in the new_thread variable. 
+			Thread* new_thread = ready_queue.dequeue();// that is remove the top of queue thread and place it in the new_thread variable. 
 		
 	// now load this new thread obtained from queue into the cPU by calling the dispatch function 
-		Thread::dispatch_to (new_thread);
+			Thread::dispatch_to (new_thread);
+		}
 	}
 }
 
@@ -90,4 +99,8 @@ void Scheduler::terminate(Thread * _thread) {
 			ready_queue.enqueue_thread(top_thread);
 		}
 	}
+}
+
+void Scheduler::pass_kernel_disk_object_to_scheduler (BlockingDisk *disk_object){
+	block_disk = disk_object; // pass the object received from kernel to the object used for calling all the methods. 
 }
